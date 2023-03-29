@@ -1,0 +1,4 @@
+
+1. use history as a cache to not re-request every defintion 
+2. save defintions in background.js 
+3. dont uses the storage in content-script.js
