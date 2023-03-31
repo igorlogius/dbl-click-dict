@@ -213,7 +213,7 @@ function removeMeaning(event) {
 }
 
 document.addEventListener("dblclick", (e) => {
-	//console.debug('TRIGGER_KEY', TRIGGER_KEY);
+  //console.debug('TRIGGER_KEY', TRIGGER_KEY);
   if (TRIGGER_KEY === "none") {
     showMeaning(e);
     return;
@@ -240,16 +240,13 @@ document.addEventListener("click", removeMeaning);
 })();
 
 // this makes the setting change immediately usable instead of having to reload the tab first
-browser.runtime.onMessage.addListener(
-  (data, sender) => {
-	//console.debug('onMessage', data, sender);
-	// update TRIGGER_KEY
-	if(!sender.tab) {  // from background script
-		
-		TRIGGER_KEY = data['TRIGGER_KEY'];
-		LANGUAGE = data['LANGUAGE']
+browser.runtime.onMessage.addListener((data, sender) => {
+  //console.debug('onMessage', data, sender);
+  // update TRIGGER_KEY
+  if (!sender.tab) {
+    // from background script
 
-	}
-
+    TRIGGER_KEY = data["TRIGGER_KEY"];
+    LANGUAGE = data["LANGUAGE"];
+  }
 });
-
