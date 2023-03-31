@@ -16,7 +16,7 @@ async function showMeaning(event) {
   // fill it with data
   let response = await retrieveMeaning(info);
 
-  console.debug("resp", response);
+  //console.debug("resp", response);
 
   if (response.content) {
     appendToDiv(createdDiv, response.content);
@@ -30,13 +30,14 @@ function getSelectionInfo(event) {
   let boundingRect;
 
   /*
-        if (window.getSelection().toString().length > 1) {
-            word = window.getSelection().toString();
-            boundingRect = getSelectionCoords(window.getSelection());
-        } else {
-            return null;
-        }
-	*/
+  if (window.getSelection().toString().length > 1) {
+      word = window.getSelection().toString();
+      boundingRect = getSelectionCoords(window.getSelection());
+  } else {
+      return null;
+  }
+  */
+
   let selection = null;
 
   if (window.getSelection) {
@@ -212,6 +213,7 @@ function removeMeaning(event) {
 }
 
 document.addEventListener("dblclick", (e) => {
+	//console.debug('TRIGGER_KEY', TRIGGER_KEY);
   if (TRIGGER_KEY === "none") {
     showMeaning(e);
     return;
@@ -236,3 +238,18 @@ document.addEventListener("click", removeMeaning);
   LANGUAGE = results.language || DEFAULT_LANGUAGE;
   TRIGGER_KEY = interaction.dblClick.key;
 })();
+
+// this makes the setting change immediately usable instead of having to reload the tab first
+browser.runtime.onMessage.addListener(
+  (data, sender) => {
+	//console.debug('onMessage', data, sender);
+	// update TRIGGER_KEY
+	if(!sender.tab) {  // from background script
+		
+		TRIGGER_KEY = data['TRIGGER_KEY'];
+		LANGUAGE = data['LANGUAGE']
+
+	}
+
+});
+

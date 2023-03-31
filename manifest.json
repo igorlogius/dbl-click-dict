@@ -2,10 +2,14 @@
   "author": "igorlogius",
   "manifest_version": 2,
   "name": "Double Click Dictionary",
-  "version": "1.1.1",
+  "browser_action": {
+	  "default_area": "navbar",
+	  "default_popup": "options.html"
+  },
+  "version": "2.1.0",
   "description": "View definitions easily as you browse the web. Double-click any word to view its definition in a small pop-up bubble.",
   "icons": {
-    "128": "icon.png"
+    "512": "icon.png"
   },
   "options_ui": {
     "page": "options.html"

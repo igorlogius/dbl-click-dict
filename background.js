@@ -1,12 +1,36 @@
 /* global browser */
+	// LANG => [lang cache]
+const DEFAULT_LANGUAGE = "en";
+const DEFAULT_TRIGGER_KEY = "none";
+const history_cache = new Map();
+let active_lang = 'eng';
+
 const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
   DEFAULT_HISTORY_SETTING = {
     enabled: true,
   };
 
 browser.runtime.onMessage.addListener(async (request, sender /*, sendResponse*/) => {
-  const { word, lang } = request,
+  const { word , lang } = request;
+
+  let results = await browser.storage.local.get("definitions");
+
+  let definitions = results.definitions || {};
+	if(typeof definitions[lang] !== 'object'){
+		//console.debug('creating definition entry for language: ', lang);
+  		definitions[lang] = {};
+	}
+
+	//console.debug('tmp: ',definitions[lang]);
+
+	if(typeof definitions[lang][word] === 'string'){
+		//console.debug(' >>>>>>>>>>     using cached definition ', lang, word);
+		let content = JSON.parse(definitions[lang][word]);
+		return { content };
+	}
+
     url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;
+	//console.debug(url);
 
   let headers = new Headers({
     "User-Agent":
@@ -19,18 +43,20 @@ browser.runtime.onMessage.addListener(async (request, sender /*, sendResponse*/)
     headers,
   });
   let text = await response.text();
-  console.debug("text", text);
+  //console.debug("text", text);
+  //console.debug(word, lang);
   const document = new DOMParser().parseFromString(text, "text/html"),
-    content = extractMeaning(document, { word, lang });
+    content = extractMeaning(document, { word, lang});
+	//console.debug(content);
 
   //sendResponse({ content });
 
-  let results = await browser.storage.local.get();
+  results = await browser.storage.local.get();
   if (content && results) {
     let history = results.history || DEFAULT_HISTORY_SETTING;
 
     if (history.enabled) {
-      saveWord(content);
+      saveWord(lang, content);
     }
   }
 	return { content };
@@ -78,15 +104,61 @@ function extractMeaning(document, context) {
   return { word: word, meaning: meaning, audioSrc: audioSrc };
 }
 
-async function saveWord(content) {
+async function saveWord(lang, content) {
   let word = content.word;
   let meaning = content.meaning;
   let results = await browser.storage.local.get("definitions");
 
-  let definitions = results.definitions || {};
 
-  definitions[word] = meaning;
+
+  let definitions = results.definitions; 
+	if(typeof definitions  !== 'object'){
+		definitions = {};
+	}
+	if(typeof definitions[lang] !== 'object'){
+		definitions[lang]  = {};
+	}
+
+  definitions[lang][word] = JSON.stringify(content);
+
+	//console.log(lang, word, content)
   browser.storage.local.set({
     definitions,
   });
 }
+
+// todos 
+//
+(async () => {
+	// 1. load cache from storage 
+	// 1. load cache active_lang from storage  
+
+})();
+
+/*
+browser.storage.local.onChanged.addListener( async () => {
+
+	console.log('onStorageChanged');
+
+  let results = await browser.storage.local.get();
+
+  let interaction = results.interaction || {
+    dblClick: { key: DEFAULT_TRIGGER_KEY },
+  };
+
+  const LANGUAGE = results.language || DEFAULT_LANGUAGE;
+  const TRIGGER_KEY = interaction.dblClick.key;
+
+	const tabs = await browser.tabs.query({});
+	for(const t of tabs){
+		try {
+		await browser.tabs.sendMessage(t.id, {LANGUAGE, TRIGGER_KEY });
+		}catch(e){
+			// noop
+		}
+	}
+});
+*/
+
+// setInterval or setTimeout ... to sync cached definitions into storage 
+// later: remove elements from the cache/storage, which have not been used for a while
