@@ -76,7 +76,7 @@ function getSelectionInfo(event) {
 
 function retrieveMeaning(info) {
   return browser.runtime.sendMessage({
-    word: info.word,
+    word: info.word.toLowerCase(),
     lang: LANGUAGE,
     time: Date.now(),
   });
