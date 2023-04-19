@@ -1,12 +1,16 @@
-Double-click any word to view its definition in a pop-up bubble
-Fork of the "Dictionary Anywhere" addon initally made to make it usable for android but 
-i am gradually trying to add a couple of improvements too
+Double-click any word to view its definition in a pop-up bubble Fork of the
+"Dictionary Anywhere" addon initally made to make it usable for android but i am
+gradually trying to add a couple of improvements too
 
 <b>Features/Usage</b>
 
-Will show the definition of any word in a small pop-up bubble, when double-clicking it.
-
-
+- Will show the definition of any word in a small pop-up bubble, when
+double-clicking it.
+- adds caching to show already viewed definitions quicker and without making anothe request
+- uses async/await syntax for clearer code structure
+- lets you add a meta key to the double click action 
+- allows export of looked at definitons
+- choose between English, French, German and Spanish as the base language
 
 <b>Notes:</b>
 <ol>
