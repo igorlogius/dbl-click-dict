@@ -1,6 +1,6 @@
 Double-click any word to view its definition in a pop-up bubble Fork of the
-"Dictionary Anywhere" addon initally made to make it usable for android but i am
-gradually trying to add a couple of improvements too
+"Dictionary Anywhere" addon initally made to make it usable for android but 
+now adds a couple of more features/improvements
 
 <b>Features/Usage</b>
 
