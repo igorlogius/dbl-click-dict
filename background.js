@@ -3,7 +3,6 @@
 const FXVER = /rv:([0-9.]+)/.exec(navigator.userAgent)[1];
 const USRAG = `Mozilla/5.0 (X11; Linux x86_64; rv:${FXVER}) Gecko/20100101 Firefox/${FXVER}`;
 
-
 const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
   DEFAULT_HISTORY_SETTING = {
     enabled: true,
@@ -27,7 +26,7 @@ browser.runtime.onMessage.addListener(async (request, sender) => {
   url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;
 
   const headers = new Headers({
-    "User-Agent": USRAG 
+    "User-Agent": USRAG,
   });
 
   let response = await fetch(url, {
