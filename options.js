@@ -20,7 +20,7 @@ async function saveOptions(e) {
   //
   const LANGUAGE = document.querySelector("#language-selector").value;
   const TRIGGER_KEY = document.querySelector("#popup-dblclick-key").value;
-  const data = await browser.storage.local.set({
+  await browser.storage.local.set({
     language: LANGUAGE,
     interaction: {
       dblClick: {
@@ -68,7 +68,7 @@ async function restoreOptions() {
   document.querySelector("#store-history-checkbox").checked = history.enabled;
   let ret = 0;
   for (const lang in definitions) {
-    if (definitions.hasOwnProperty(lang)) {
+    if (definitions.hasOwn(lang)) {
       //console.debug(lang);
       ret = ret + Object.keys(definitions[lang]).length;
     }
@@ -88,7 +88,7 @@ async function downloadHistory(e) {
   //console.debug(JSON.stringify(definitions,null,4));
 
   for (const lang in definitions) {
-    if (definitions.hasOwnProperty(lang)) {
+    if (definitions.hasOwn(lang)) {
       //console.debug('lang', lang);
 
       fileContent += "\n";
@@ -97,7 +97,7 @@ async function downloadHistory(e) {
       fileContent += "\n";
 
       for (const definition in definitions[lang]) {
-        if (definitions[lang].hasOwnProperty(definition)) {
+        if (definitions[lang].hasOwn(definition)) {
           fileContent += definition;
           fileContent += "\t";
           fileContent += JSON.parse(definitions[lang][definition]).meaning;

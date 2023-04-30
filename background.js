@@ -8,7 +8,7 @@ const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
     enabled: true,
   };
 
-browser.runtime.onMessage.addListener(async (request, sender) => {
+browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
   const { word, lang } = request;
 
   let results = await browser.storage.local.get("definitions");
@@ -23,7 +23,7 @@ browser.runtime.onMessage.addListener(async (request, sender) => {
     return { content };
   }
 
-  url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;
+  let url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;
 
   const headers = new Headers({
     "User-Agent": USRAG,
@@ -93,7 +93,7 @@ function extractMeaning(document, context) {
 
 async function saveWord(lang, content) {
   let word = content.word;
-  let meaning = content.meaning;
+  //let meaning = content.meaning;
   let results = await browser.storage.local.get("definitions");
 
   let definitions = results.definitions;

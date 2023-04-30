@@ -4,6 +4,50 @@ let DEFAULT_LANGUAGE = "en",
   LANGUAGE,
   TRIGGER_KEY;
 
+function dragElement(elmnt) {
+  var pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    // if present, the header is where you move the DIV from:
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    // otherwise, move the DIV from anywhere inside the DIV:
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+  }
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+
 async function showMeaning(event) {
   let info = getSelectionInfo(event);
   if (!info) {
@@ -85,17 +129,124 @@ function retrieveMeaning(info) {
 function createDiv(info) {
   let hostDiv = document.createElement("div");
 
+  dragElement(hostDiv);
+
   hostDiv.className = "dictionaryDiv";
-  hostDiv.style.left = info.left - 10 + "px";
+
+  /*
+  const body_bounding_rect = document.body.getBoundingClientRect();
+
+	
+	if(info.left > body_bounding_rect.width/2){
+	  const val = `calc(${info.left - 10}px - 25vw)`;
+		console.debug(val);
+	  hostDiv.style.left = val;
+	}else{
+	  hostDiv.style.left = info.left - 10 + "px";
+	}
+	console.debug(hostDiv.style.left);
+	*/
+
   hostDiv.style.position = "absolute";
   hostDiv.style.zIndex = "1000000";
   hostDiv.attachShadow({ mode: "open" });
 
+  const isDarkMode =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
   let shadow = hostDiv.shadowRoot;
   let style = document.createElement("style");
   //style.textContent = "*{ all: initial}";
-  style.textContent =
-    ".mwe-popups{background:lightgray;position:absolute;z-index:110;-webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;padding:0;font-size:14px;min-width:300px;border-radius:2px}.mwe-popups.mwe-popups-is-not-tall{width:320px}.mwe-popups .mwe-popups-container{color:#222;margin-top:-9px;padding-top:9px;text-decoration:none}.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract{min-height:40px;max-height:140px;overflow:hidden;margin-bottom:47px;padding-bottom:0}.mwe-popups .mwe-popups-extract{margin:16px;display:block;color:#222;text-decoration:none;position:relative} .mwe-popups.flipped_y:before{content:'';position:absolute;border:8px solid transparent;border-bottom:0;border-top: 8px solid #a2a9b1;bottom:-8px;left:10px}.mwe-popups.flipped_y:after{content:'';position:absolute;border:11px solid transparent;border-bottom:0;border-top:11px solid #fff;bottom:-7px;left:7px} .mwe-popups.mwe-popups-no-image-tri:before{content:'';position:absolute;border:8px solid transparent;border-top:0;border-bottom: 8px solid #a2a9b1;top:-8px;left:10px}.mwe-popups.mwe-popups-no-image-tri:after{content:'';position:absolute;border:11px solid transparent;border-top:0;border-bottom:11px solid #fff;top:-7px;left:7px} .audio{background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);background-position: center;background-repeat: no-repeat;cursor:pointer;margin-left: 8px;opacity: 0.5; width: 16px; display: inline-block;} .audio:hover {opacity: 1;}";
+  //  style.textContent = ".mwe-popups{background:lightgray;position:absolute;z-index:110;-webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;padding:0;font-size:14px;min-width:300px;border-radius:2px}.mwe-popups.mwe-popups-is-not-tall{width:320px}.mwe-popups .mwe-popups-container{color:#222;margin-top:-9px;padding-top:9px;text-decoration:none}.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract{min-height:40px;max-height:140px;overflow:hidden;margin-bottom:47px;padding-bottom:0}.mwe-popups .mwe-popups-extract{margin:16px;display:block;color:#222;text-decoration:none;position:relative} .mwe-popups.flipped_y:before{content:'';position:absolute;border:8px solid transparent;border-bottom:0;border-top: 8px solid #a2a9b1;bottom:-8px;left:10px}.mwe-popups.flipped_y:after{content:'';position:absolute;border:11px solid transparent;border-bottom:0;border-top:11px solid #fff;bottom:-7px;left:7px} .mwe-popups.mwe-popups-no-image-tri:before{content:'';position:absolute;border:8px solid transparent;border-top:0;border-bottom: 8px solid #a2a9b1;top:-8px;left:10px}.mwe-popups.mwe-popups-no-image-tri:after{content:'';position:absolute;border:11px solid transparent;border-top:0;border-bottom:11px solid #fff;top:-7px;left:7px} .audio{background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);background-position: center;background-repeat: no-repeat;cursor:pointer;margin-left: 8px;opacity: 0.5; width: 16px; display: inline-block;} .audio:hover {opacity: 1;}";
+  style.textContent = `
+
+.mwe-popups {
+    background: ${isDarkMode ? "#333" : "white"};
+    position:absolute;
+    z-index:110;
+    -webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;
+    box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;
+    padding:0;
+    font-size:14px;
+    left:15vw;
+    width: 70vw;
+    border-radius:2px;
+    color: ${isDarkMode ? "#fff" : "#222"};
+}
+/*
+.mwe-popups.mwe-popups-is-not-tall {
+    width:320px
+}
+*/
+.mwe-popups .mwe-popups-container{
+    margin-top:-9px;
+    padding-top:9px;
+    text-decoration:none
+}
+.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract {
+    min-height:40px;
+    max-height:140px;
+    overflow:hidden;
+    margin-bottom:47px;
+    padding-bottom:0
+}
+.mwe-popups .mwe-popups-extract {
+    margin:16px;
+    display:block;
+    text-decoration:none;
+    position:relative
+}
+/*
+.mwe-popups.flipped_y:before {
+    content:'';
+    position:absolute;
+    border:8px solid transparent;
+    border-bottom:0;
+    border-top: 8px solid #a2a9b1;
+    bottom:-8px;
+    left:10px
+}
+.mwe-popups.flipped_y:after {
+    content:'';
+    position:absolute;
+    border:11px solid transparent;
+    border-bottom:0;
+    border-top:11px solid #fff;
+    bottom:-7px;
+    left:7px
+}
+ .mwe-popups.mwe-popups-no-image-tri:before {
+    content:'';
+    position:absolute;
+    border:8px solid transparent;
+    border-top:0;
+    border-bottom: 8px solid #a2a9b1;
+    top:-8px;
+    left:10px;
+}
+.mwe-popups.mwe-popups-no-image-tri:after {
+    content:'';
+    position:absolute;
+    border:11px solid transparent;
+    border-top:0;
+    border-bottom:11px solid #fff;
+    top:-7px;
+    left:7px;
+}
+*/
+.audio {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor:pointer;
+    margin-left: 8px;
+    width: 16px;
+    opacity: 0.5;
+    display: inline-block;
+    background-color: white;
+}
+`;
   shadow.appendChild(style);
 
   let encapsulateDiv = document.createElement("div");
@@ -133,7 +284,8 @@ function createDiv(info) {
 
   let moreInfo = document.createElement("a");
   moreInfo.href = `https://www.google.com/search?hl=${LANGUAGE}&q=define+${info.word}`;
-  moreInfo.style = "float: right; text-decoration: none;";
+  moreInfo.style =
+    "float: right; text-decoration: none;background-color:white;opacity: 0.5;";
   moreInfo.target = "_blank";
 
   content.appendChild(heading);
