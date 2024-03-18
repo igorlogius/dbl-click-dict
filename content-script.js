@@ -50,8 +50,8 @@ function dragElement(elmnt) {
 }
 */
 
-async function showMeaning(/*event*/) {
-  let info = getSelectionInfo(/*event*/);
+async function showMeaning(event) {
+  let info = getSelectionInfo(event);
   if (!info) {
     return;
   }
@@ -71,9 +71,9 @@ async function showMeaning(/*event*/) {
   }
 }
 
-function getSelectionInfo(/*event*/) {
+function getSelectionInfo(event) {
   let word;
-  //let boundingRect;
+  let boundingRect;
 
   /*
   if (window.getSelection().toString().length > 1) {
@@ -92,7 +92,7 @@ function getSelectionInfo(/*event*/) {
     selection = document.selection;
   }
 
-  //boundingRect = getSelectionCoords(selection);
+  boundingRect = getSelectionCoords(selection);
   let selectedRange = selection.getRangeAt(0);
   word = selectedRange.toString();
 
@@ -100,27 +100,23 @@ function getSelectionInfo(/*event*/) {
     return null;
   }
 
-  /*
   let top = boundingRect.top + window.scrollY,
     bottom = boundingRect.bottom + window.scrollY,
     left = boundingRect.left + window.scrollX;
-    */
 
-  /*
   if (boundingRect.height == 0) {
     top = event.pageY;
     bottom = event.pageY;
     left = event.pageX;
   }
-    */
 
   return {
-    //top: top,
-    //bottom: bottom,
-    //left: left,
+    top: top,
+    bottom: bottom,
+    left: left,
     word: word,
-    //clientY: 0, //event.clientY,
-    //height: boundingRect.height,
+    clientY: event.clientY,
+    height: boundingRect.height,
   };
 }
 
@@ -175,7 +171,6 @@ function createDiv(info) {
     box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;
     padding:0;
     font-size:14px;
-    top: 0;
     left:15vw;
     width: 70vw;
     border-radius:2px;
@@ -305,7 +300,6 @@ function createDiv(info) {
     "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
   hostDiv.style.top = 10 + "px";
 
-  /*
   if (info.clientY < window.innerHeight / 2) {
     popupDiv.className =
       "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
@@ -321,7 +315,6 @@ function createDiv(info) {
       hostDiv.style.top = parseInt(hostDiv.style.top) - 8 + "px";
     }
   }
-    */
 
   return {
     heading,
@@ -331,13 +324,11 @@ function createDiv(info) {
   };
 }
 
-/*
 function getSelectionCoords(selection) {
   let oRange = selection.getRangeAt(0); //get the text range
   let oRect = oRange.getBoundingClientRect();
   return oRect;
 }
-*/
 
 function appendToDiv(createdDiv, content) {
   let hostDiv = createdDiv.heading.getRootNode().host;
