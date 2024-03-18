@@ -47,15 +47,14 @@ async function saveOptions(e) {
 async function restoreOptions() {
   let results = await browser.storage.local.get();
 
-    results = results || {};
+  results = results || {};
 
-    results = results || {};
+  results = results || {};
 
   let language = results.language || DEFAULT_LANGUAGE,
     interaction = results.interaction || {},
     history = results.history || { enabled: IS_HISTORY_ENABLED_BY_DEFAULT },
     definitions = results.definitions || {};
-
 
   // language
   document.querySelector("#language-selector").value =
@@ -73,7 +72,7 @@ async function restoreOptions() {
   document.querySelector("#store-history-checkbox").checked = history.enabled;
   let ret = 0;
   for (const lang in definitions) {
-    if (Object.hasOwn(definitions,lang)) {
+    if (Object.hasOwn(definitions, lang)) {
       //console.debug(lang);
       ret = ret + Object.keys(definitions[lang]).length;
     }
@@ -93,7 +92,7 @@ async function downloadHistory(e) {
   //console.debug(JSON.stringify(definitions,null,4));
 
   for (const lang in definitions) {
-    if (Object.hasOwn(definitions,lang)) {
+    if (Object.hasOwn(definitions, lang)) {
       //console.debug('lang', lang);
 
       fileContent += "\n";
@@ -102,7 +101,7 @@ async function downloadHistory(e) {
       fileContent += "\n";
 
       for (const definition in definitions[lang]) {
-        if (Object.hasOwn(definitions[lang],definition)) {
+        if (Object.hasOwn(definitions[lang], definition)) {
           fileContent += definition;
           fileContent += "\t";
           fileContent += JSON.parse(definitions[lang][definition]).meaning;

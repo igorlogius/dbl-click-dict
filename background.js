@@ -110,3 +110,11 @@ async function saveWord(lang, content) {
     definitions,
   });
 }
+
+browser.menus.create({
+  title: "Definition",
+  contexts: ["selection"],
+  onclick: (info, tab) => {
+    browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
+  },
+});
