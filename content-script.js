@@ -1,54 +1,10 @@
 /* global browser */
+
 let DEFAULT_LANGUAGE = "en",
   DEFAULT_TRIGGER_KEY = "none",
   LANGUAGE,
-  TRIGGER_KEY;
-
-/*
-function dragElement(elmnt) {
-  var pos1 = 0,
-    pos2 = 0,
-    pos3 = 0,
-    pos4 = 0;
-  if (document.getElementById(elmnt.id + "header")) {
-    // if present, the header is where you move the DIV from:
-    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-  } else {
-    // otherwise, move the DIV from anywhere inside the DIV:
-    elmnt.onmousedown = dragMouseDown;
-  }
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
-
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
-    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
-  }
-
-  function closeDragElement() {
-    // stop moving when mouse button is released:
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
-}
-*/
+  TRIGGER_KEY,
+  showMeaningTID = null;
 
 async function showMeaning(event) {
   let info = getSelectionInfo(event);
@@ -62,8 +18,6 @@ async function showMeaning(event) {
   // fill it with data
   let response = await retrieveMeaning(info);
 
-  //console.debug("resp", response);
-
   if (response.content) {
     appendToDiv(createdDiv, response.content);
   } else {
@@ -75,49 +29,38 @@ function getSelectionInfo(event) {
   let word;
   let boundingRect;
 
-  /*
-  if (window.getSelection().toString().length > 1) {
-      word = window.getSelection().toString();
-      boundingRect = getSelectionCoords(window.getSelection());
-  } else {
-      return null;
-  }
-  */
-
   let selection = null;
 
-  if (window.getSelection) {
-    selection = window.getSelection();
-  } else if (typeof document.selection != "undefined") {
-    selection = document.selection;
+  try {
+    if (window.getSelection) {
+      selection = window.getSelection();
+    } else if (typeof document.selection != "undefined") {
+      selection = document.selection;
+    }
+
+    boundingRect = getSelectionCoords(selection);
+    let selectedRange = selection.getRangeAt(0);
+    word = selectedRange.toString();
+
+    if (word.length < 1) {
+      return null;
+    }
+
+    let top = boundingRect.top + window.scrollY,
+      bottom = boundingRect.bottom + window.scrollY,
+      left = boundingRect.left + window.scrollX;
+
+    return {
+      top: top,
+      bottom: bottom,
+      left: left,
+      word: word,
+      //clientY: window.pageYOffset, //event.clientY,
+      height: boundingRect.height,
+    };
+  } catch (e) {
+    return null; // selection not available
   }
-
-  boundingRect = getSelectionCoords(selection);
-  let selectedRange = selection.getRangeAt(0);
-  word = selectedRange.toString();
-
-  if (word.length < 1) {
-    return null;
-  }
-
-  let top = boundingRect.top + window.scrollY,
-    bottom = boundingRect.bottom + window.scrollY,
-    left = boundingRect.left + window.scrollX;
-
-  if (boundingRect.height == 0) {
-    top = event.pageY;
-    bottom = event.pageY;
-    left = event.pageX;
-  }
-
-  return {
-    top: top,
-    bottom: bottom,
-    left: left,
-    word: word,
-    clientY: event.clientY,
-    height: boundingRect.height,
-  };
 }
 
 function retrieveMeaning(info) {
@@ -130,8 +73,6 @@ function retrieveMeaning(info) {
 
 function createDiv(info) {
   let hostDiv = document.createElement("div");
-
-  //dragElement(hostDiv);
 
   hostDiv.className = "dictionaryDiv";
 
@@ -165,12 +106,13 @@ function createDiv(info) {
 
 .mwe-popups {
     background: ${isDarkMode ? "#333" : "white"};
-    position:absolute;
+    position:fixed;
     z-index:110;
     -webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;
     box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;
     padding:0;
     font-size:14px;
+    top: 0;
     left:15vw;
     width: 70vw;
     border-radius:2px;
@@ -298,6 +240,8 @@ function createDiv(info) {
 
   popupDiv.className =
     "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
+
+  /*
   hostDiv.style.top = 10 + "px";
 
   if (info.clientY < window.innerHeight / 2) {
@@ -315,6 +259,7 @@ function createDiv(info) {
       hostDiv.style.top = parseInt(hostDiv.style.top) - 8 + "px";
     }
   }
+    */
 
   return {
     heading,
@@ -370,16 +315,36 @@ function removeMeaning(event) {
   }
 }
 
-document.addEventListener("dblclick", (e) => {
-  //console.debug('TRIGGER_KEY', TRIGGER_KEY);
-  if (TRIGGER_KEY === "none") {
+function delayed_showMeaning(e) {
+  clearTimeout(showMeaningTID);
+
+  showMeaningTID = setTimeout(() => {
     showMeaning(e);
+  }, 700);
+}
+
+document.addEventListener("mouseup", (e) => {
+  if (TRIGGER_KEY === "none") {
+    delayed_showMeaning(e);
     return;
   }
 
   //e has property altKey, shiftKey, cmdKey representing they key being pressed while double clicking.
   if (e[`${TRIGGER_KEY}Key`]) {
-    showMeaning(e);
+    delayed_showMeaning(e);
+    return;
+  }
+});
+
+document.addEventListener("touchstart", (e) => {
+  if (TRIGGER_KEY === "none") {
+    delayed_showMeaning(e);
+    return;
+  }
+
+  //e has property altKey, shiftKey, cmdKey representing they key being pressed while double clicking.
+  if (e[`${TRIGGER_KEY}Key`]) {
+    delayed_showMeaning(e);
     return;
   }
 });
@@ -399,15 +364,14 @@ document.addEventListener("click", removeMeaning);
 
 // this makes the setting change immediately usable instead of having to reload the tab first
 browser.runtime.onMessage.addListener((data, sender) => {
-  //console.debug('onMessage', data, sender);
+  //console.debug("onMessage", data, sender);
   // update TRIGGER_KEY
   if (data.cmd === "showMeaning") {
     showMeaning(null);
     return;
   }
-  if (!sender.tab) {
+  if (data.cmd === "updateSettings") {
     // from background script
-
     TRIGGER_KEY = data["TRIGGER_KEY"];
     LANGUAGE = data["LANGUAGE"];
   }

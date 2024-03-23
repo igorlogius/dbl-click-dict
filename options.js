@@ -15,7 +15,7 @@ const DEFAULT_LANGUAGE = "en",
 async function saveOptions(e) {
   e.preventDefault();
   //console.debug('saveOptions');
-  //browser.runtime.sendMessage({TRIGGER_KEY: document.querySelector("#popup-dblclick-key").value, LANGUAGE: document.querySelector("#language-selector").value });
+  //browser.runtime.sendMessage({cmd: 'updateSettings', TRIGGER_KEY: document.querySelector("#popup-dblclick-key").value, LANGUAGE: document.querySelector("#language-selector").value });
   //await browser.runtime.sendMessage({});
   //
   const LANGUAGE = document.querySelector("#language-selector").value;

@@ -118,3 +118,9 @@ browser.menus.create({
     browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
   },
 });
+
+browser.browserAction.onClicked.addListener((tab, info) => {
+  console.debug("ba clicked");
+
+  browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
+});
