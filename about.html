@@ -2,6 +2,10 @@ Double-click any word to view its definition in a pop-up bubble Fork of the
 "Dictionary Anywhere" addon initally made to make it usable for android but now
 adds a couple of more features/improvements
 
+<b>Short Demo Video:</b>
+
+https://github.com/igorlogius/dbl-click-dict/assets/67047467/ad61d99a-22e4-43c1-8694-4ae14a2b3813
+
 <b>Features/Usage</b>
 
 - Will show the definition of any word in a small pop-up bubble, when
