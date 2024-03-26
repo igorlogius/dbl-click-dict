@@ -9,18 +9,23 @@ const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
   };
 
 browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
-  const { word, lang } = request;
+  const { cmd, word, lang } = request;
 
-  let results = await browser.storage.local.get("definitions");
+  console.debug(request);
 
-  let definitions = results.definitions || {};
-  if (typeof definitions[lang] !== "object") {
-    definitions[lang] = {};
-  }
+  if (cmd === "cache") {
+    let results = await browser.storage.local.get("definitions");
 
-  if (typeof definitions[lang][word] === "string") {
-    let content = JSON.parse(definitions[lang][word]);
-    return { content };
+    let definitions = results.definitions || {};
+    if (typeof definitions[lang] !== "object") {
+      definitions[lang] = {};
+    }
+
+    if (typeof definitions[lang][word] === "string") {
+      let content = JSON.parse(definitions[lang][word]);
+      return { content };
+    }
+    return null;
   }
 
   let url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;

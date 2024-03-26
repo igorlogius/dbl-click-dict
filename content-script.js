@@ -12,11 +12,21 @@ async function showMeaning(event) {
     return;
   }
 
+  let response = await retrieveMeaningFromCache(info);
+
+  if (response === null) {
+    if (TRIGGER_KEY === "none") {
+      if (window.confirm("Lookup definition for '" + info.word + "'?")) {
+        response = await retrieveMeaning(info);
+      } else {
+        return;
+      }
+    } else {
+      response = await retrieveMeaning(info);
+    }
+  }
   // create defintion container
   let createdDiv = createDiv(info);
-
-  // fill it with data
-  let response = await retrieveMeaning(info);
 
   if (response.content) {
     appendToDiv(createdDiv, response.content);
@@ -63,8 +73,18 @@ function getSelectionInfo(event) {
   }
 }
 
+function retrieveMeaningFromCache(info) {
+  return browser.runtime.sendMessage({
+    cmd: "cache",
+    word: info.word.toLowerCase(),
+    lang: LANGUAGE,
+    time: Date.now(),
+  });
+}
+
 function retrieveMeaning(info) {
   return browser.runtime.sendMessage({
+    cmd: "remote",
     word: info.word.toLowerCase(),
     lang: LANGUAGE,
     time: Date.now(),
