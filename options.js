@@ -3,6 +3,7 @@
 const DEFAULT_LANGUAGE = "en",
   DEFAULT_TRIGGER_KEY = "none",
   IS_HISTORY_ENABLED_BY_DEFAULT = true,
+  IS_CONFIRM_ENABLED_BY_DEFAULT = true,
   SAVE_STATUS = document.querySelector("#save-status"),
   SAVE_OPTIONS_BUTTON = document.querySelector("#save-btn"),
   RESET_OPTIONS_BUTTON = document.querySelector("#reset-btn"),
@@ -14,9 +15,6 @@ const DEFAULT_LANGUAGE = "en",
 
 async function saveOptions(e) {
   e.preventDefault();
-  //console.debug('saveOptions');
-  //browser.runtime.sendMessage({cmd: 'updateSettings', TRIGGER_KEY: document.querySelector("#popup-dblclick-key").value, LANGUAGE: document.querySelector("#language-selector").value });
-  //await browser.runtime.sendMessage({});
   //
   const LANGUAGE = document.querySelector("#language-selector").value;
   const TRIGGER_KEY = document.querySelector("#popup-dblclick-key").value;
@@ -30,13 +28,22 @@ async function saveOptions(e) {
     history: {
       enabled: document.querySelector("#store-history-checkbox").checked,
     },
+    confirm: {
+      enabled: document.querySelector("#store-confirm-checkbox").checked,
+    },
   });
 
   const tabs = await browser.tabs.query({});
   for (const t of tabs) {
     try {
-      await browser.tabs.sendMessage(t.id, { LANGUAGE, TRIGGER_KEY });
+      await browser.tabs.sendMessage(t.id, {
+        cmd: "updateSettings",
+        TRIGGER_KEY: document.querySelector("#popup-dblclick-key").value,
+        LANGUAGE: document.querySelector("#language-selector").value,
+        CONFIRM: document.querySelector("#store-confirm-checkbox").checked,
+      });
     } catch (e) {
+      console.error(e);
       // noop
     }
   }
@@ -54,31 +61,30 @@ async function restoreOptions() {
   let language = results.language || DEFAULT_LANGUAGE,
     interaction = results.interaction || {},
     history = results.history || { enabled: IS_HISTORY_ENABLED_BY_DEFAULT },
-    definitions = results.definitions || {};
+    definitions = results.definitions || {},
+    confirm = results.confirm || { enabled: IS_CONFIRM_ENABLED_BY_DEFAULT };
 
   // language
   document.querySelector("#language-selector").value =
     language || DEFAULT_LANGUAGE;
 
   // interaction
-  // document.querySelector("#popup-dblclick-checkbox").checked = interaction.dblClick.enabled;
   document.querySelector("#popup-dblclick-key").value =
     (interaction.dblClick && interaction.dblClick.key) || DEFAULT_TRIGGER_KEY;
 
-  // document.querySelector("#popup-select-checkbox").checked = interaction.select.enabled;
-  // document.querySelector("#popup-select-key").value = interaction.select.key;
-
   // history
   document.querySelector("#store-history-checkbox").checked = history.enabled;
+
+  // confirm
+  document.querySelector("#store-confirm-checkbox").checked = confirm.enabled;
+
   let ret = 0;
   for (const lang in definitions) {
     if (Object.hasOwn(definitions, lang)) {
-      //console.debug(lang);
       ret = ret + Object.keys(definitions[lang]).length;
     }
   }
   document.querySelector("#num-words-in-history").innerText = ret;
-  //console.debug('blub', ret);
 }
 
 async function downloadHistory(e) {
@@ -89,12 +95,8 @@ async function downloadHistory(e) {
 
   let definitions = results.definitions || {};
 
-  //console.debug(JSON.stringify(definitions,null,4));
-
   for (const lang in definitions) {
     if (Object.hasOwn(definitions, lang)) {
-      //console.debug('lang', lang);
-
       fileContent += "\n";
       fileContent += "LANGUAGE: " + lang;
       fileContent += "\n";
@@ -132,6 +134,9 @@ async function resetOptions(e) {
     },
     history: {
       enabled: IS_HISTORY_ENABLED_BY_DEFAULT,
+    },
+    confirm: {
+      enabled: IS_CONFIRM_ENABLED_BY_DEFAULT,
     },
   });
 

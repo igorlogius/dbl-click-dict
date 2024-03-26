@@ -4,6 +4,7 @@ let DEFAULT_LANGUAGE = "en",
   DEFAULT_TRIGGER_KEY = "none",
   LANGUAGE,
   TRIGGER_KEY,
+  CONFIRM,
   showMeaningTID = null;
 
 async function showMeaning(event) {
@@ -15,7 +16,7 @@ async function showMeaning(event) {
   let response = await retrieveMeaningFromCache(info);
 
   if (response === null) {
-    if (TRIGGER_KEY === "none") {
+    if (TRIGGER_KEY === "none" && CONFIRM === true) {
       if (window.confirm("Lookup definition for '" + info.word + "'?")) {
         response = await retrieveMeaning(info);
       } else {
@@ -65,7 +66,6 @@ function getSelectionInfo(event) {
       bottom: bottom,
       left: left,
       word: word,
-      //clientY: window.pageYOffset, //event.clientY,
       height: boundingRect.height,
     };
   } catch (e) {
@@ -96,20 +96,6 @@ function createDiv(info) {
 
   hostDiv.className = "dictionaryDiv";
 
-  /*
-  const body_bounding_rect = document.body.getBoundingClientRect();
-
-
-	if(info.left > body_bounding_rect.width/2){
-	  const val = `calc(${info.left - 10}px - 25vw)`;
-		console.debug(val);
-	  hostDiv.style.left = val;
-	}else{
-	  hostDiv.style.left = info.left - 10 + "px";
-	}
-	console.debug(hostDiv.style.left);
-	*/
-
   hostDiv.style.position = "absolute";
   hostDiv.style.zIndex = "1000000";
   hostDiv.attachShadow({ mode: "open" });
@@ -120,8 +106,6 @@ function createDiv(info) {
 
   let shadow = hostDiv.shadowRoot;
   let style = document.createElement("style");
-  //style.textContent = "*{ all: initial}";
-  //  style.textContent = ".mwe-popups{background:lightgray;position:absolute;z-index:110;-webkit-box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;box-shadow:0 30px 90px -20px rgba(0,0,0,0.3),0 0 1px #a2a9b1;padding:0;font-size:14px;min-width:300px;border-radius:2px}.mwe-popups.mwe-popups-is-not-tall{width:320px}.mwe-popups .mwe-popups-container{color:#222;margin-top:-9px;padding-top:9px;text-decoration:none}.mwe-popups.mwe-popups-is-not-tall .mwe-popups-extract{min-height:40px;max-height:140px;overflow:hidden;margin-bottom:47px;padding-bottom:0}.mwe-popups .mwe-popups-extract{margin:16px;display:block;color:#222;text-decoration:none;position:relative} .mwe-popups.flipped_y:before{content:'';position:absolute;border:8px solid transparent;border-bottom:0;border-top: 8px solid #a2a9b1;bottom:-8px;left:10px}.mwe-popups.flipped_y:after{content:'';position:absolute;border:11px solid transparent;border-bottom:0;border-top:11px solid #fff;bottom:-7px;left:7px} .mwe-popups.mwe-popups-no-image-tri:before{content:'';position:absolute;border:8px solid transparent;border-top:0;border-bottom: 8px solid #a2a9b1;top:-8px;left:10px}.mwe-popups.mwe-popups-no-image-tri:after{content:'';position:absolute;border:11px solid transparent;border-top:0;border-bottom:11px solid #fff;top:-7px;left:7px} .audio{background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);background-position: center;background-repeat: no-repeat;cursor:pointer;margin-left: 8px;opacity: 0.5; width: 16px; display: inline-block;} .audio:hover {opacity: 1;}";
   style.textContent = `
 
 .mwe-popups {
@@ -261,26 +245,6 @@ function createDiv(info) {
   popupDiv.className =
     "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
 
-  /*
-  hostDiv.style.top = 10 + "px";
-
-  if (info.clientY < window.innerHeight / 2) {
-    popupDiv.className =
-      "mwe-popups mwe-popups-no-image-tri mwe-popups-is-not-tall";
-    hostDiv.style.top = info.bottom + 10 + "px";
-    if (info.height == 0) {
-      hostDiv.style.top = parseInt(hostDiv.style.top) + 8 + "px";
-    }
-  } else {
-    popupDiv.className = "mwe-popups flipped_y mwe-popups-is-not-tall";
-    hostDiv.style.top = info.top - 10 - popupDiv.clientHeight + "px";
-
-    if (info.height == 0) {
-      hostDiv.style.top = parseInt(hostDiv.style.top) - 8 + "px";
-    }
-  }
-    */
-
   return {
     heading,
     meaning,
@@ -380,11 +344,11 @@ document.addEventListener("click", removeMeaning);
 
   LANGUAGE = results.language || DEFAULT_LANGUAGE;
   TRIGGER_KEY = interaction.dblClick.key;
+  CONFIRM = typeof results.confirm === "boolean" ? results.confirm : true;
 })();
 
 // this makes the setting change immediately usable instead of having to reload the tab first
 browser.runtime.onMessage.addListener((data, sender) => {
-  //console.debug("onMessage", data, sender);
   // update TRIGGER_KEY
   if (data.cmd === "showMeaning") {
     showMeaning(null);
@@ -394,5 +358,6 @@ browser.runtime.onMessage.addListener((data, sender) => {
     // from background script
     TRIGGER_KEY = data["TRIGGER_KEY"];
     LANGUAGE = data["LANGUAGE"];
+    CONFIRM = data["CONFIRM"];
   }
 });

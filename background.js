@@ -11,8 +11,6 @@ const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
 browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
   const { cmd, word, lang } = request;
 
-  console.debug(request);
-
   if (cmd === "cache") {
     let results = await browser.storage.local.get("definitions");
 
@@ -125,7 +123,5 @@ browser.menus.create({
 });
 
 browser.browserAction.onClicked.addListener((tab, info) => {
-  console.debug("ba clicked");
-
   browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
 });
