@@ -3,7 +3,7 @@
 const DEFAULT_LANGUAGE = "en",
   DEFAULT_TRIGGER_KEY = "none",
   IS_HISTORY_ENABLED_BY_DEFAULT = true,
-  IS_CONFIRM_ENABLED_BY_DEFAULT = true,
+  IS_CONFIRM_ENABLED_BY_DEFAULT = false,
   SAVE_STATUS = document.querySelector("#save-status"),
   SAVE_OPTIONS_BUTTON = document.querySelector("#save-btn"),
   RESET_OPTIONS_BUTTON = document.querySelector("#reset-btn"),

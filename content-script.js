@@ -307,6 +307,7 @@ function delayed_showMeaning(e) {
   }, 700);
 }
 
+/*
 document.addEventListener("mouseup", (e) => {
   if (TRIGGER_KEY === "none") {
     delayed_showMeaning(e);
@@ -319,8 +320,10 @@ document.addEventListener("mouseup", (e) => {
     return;
   }
 });
+*/
 
-document.addEventListener("touchstart", (e) => {
+/*
+document.addEventListener("dblclick", (e) => {
   if (TRIGGER_KEY === "none") {
     delayed_showMeaning(e);
     return;
@@ -334,6 +337,7 @@ document.addEventListener("touchstart", (e) => {
 });
 
 document.addEventListener("click", removeMeaning);
+*/
 
 (async function () {
   let results = await browser.storage.local.get();
@@ -344,7 +348,28 @@ document.addEventListener("click", removeMeaning);
 
   LANGUAGE = results.language || DEFAULT_LANGUAGE;
   TRIGGER_KEY = interaction.dblClick.key;
-  CONFIRM = typeof results.confirm === "boolean" ? results.confirm : true;
+  CONFIRM = typeof results.confirm === "boolean" ? results.confirm : false;
+
+  delete Hammer.defaults.cssProps.userSelect;
+  var mc = new Hammer.Manager(document.body);
+
+  // Tap recognizer with minimal 2 taps
+  mc.add(new Hammer.Tap({ event: "doubletap", taps: 2 }));
+  // Single tap recognizer
+  mc.add(new Hammer.Tap({ event: "singletap" }));
+
+  // we want to recognize this simulatenous, so a quadrupletap will be detected even while a tap has been recognized.
+  mc.get("doubletap").recognizeWith("singletap");
+  // we only want to trigger a tap, when we don't have detected a doubletap
+  mc.get("singletap").requireFailure("doubletap");
+
+  mc.on("doubletap", function (ev) {
+    delayed_showMeaning(ev);
+  });
+
+  mc.on("singletap", function (ev) {
+    removeMeaning(ev);
+  });
 })();
 
 // this makes the setting change immediately usable instead of having to reload the tab first
