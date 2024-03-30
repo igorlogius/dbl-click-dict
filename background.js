@@ -9,6 +9,8 @@ const GOOGLE_SPEECH_URI = "https://www.google.com/speech-api/v1/synthesize",
   };
 
 browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
+  browser.browserAction.disable();
+
   const { cmd, word, lang } = request;
 
   if (cmd === "cache") {
@@ -21,8 +23,10 @@ browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
 
     if (typeof definitions[lang][word] === "string") {
       let content = JSON.parse(definitions[lang][word]);
+      browser.browserAction.enable();
       return { content };
     }
+    browser.browserAction.enable();
     return null;
   }
 
@@ -50,6 +54,7 @@ browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
       saveWord(lang, content);
     }
   }
+  browser.browserAction.enable();
   return { content };
 });
 
@@ -96,7 +101,6 @@ function extractMeaning(document, context) {
 
 async function saveWord(lang, content) {
   let word = content.word;
-  //let meaning = content.meaning;
   let results = await browser.storage.local.get("definitions");
 
   let definitions = results.definitions;
@@ -120,8 +124,4 @@ browser.menus.create({
   onclick: (info, tab) => {
     browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
   },
-});
-
-browser.browserAction.onClicked.addListener((tab, info) => {
-  browser.tabs.sendMessage(tab.id, { cmd: "showMeaning" });
 });

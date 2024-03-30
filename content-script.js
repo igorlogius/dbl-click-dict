@@ -4,8 +4,7 @@ let DEFAULT_LANGUAGE = "en",
   DEFAULT_TRIGGER_KEY = "none",
   LANGUAGE,
   TRIGGER_KEY,
-  CONFIRM,
-  showMeaningTID = null;
+  CONFIRM;
 
 async function showMeaning(event) {
   let info = getSelectionInfo(event);
@@ -38,7 +37,6 @@ async function showMeaning(event) {
 
 function getSelectionInfo(event) {
   let word;
-  let boundingRect;
 
   let selection = null;
 
@@ -49,7 +47,6 @@ function getSelectionInfo(event) {
       selection = document.selection;
     }
 
-    boundingRect = getSelectionCoords(selection);
     let selectedRange = selection.getRangeAt(0);
     word = selectedRange.toString();
 
@@ -57,16 +54,8 @@ function getSelectionInfo(event) {
       return null;
     }
 
-    let top = boundingRect.top + window.scrollY,
-      bottom = boundingRect.bottom + window.scrollY,
-      left = boundingRect.left + window.scrollX;
-
     return {
-      top: top,
-      bottom: bottom,
-      left: left,
       word: word,
-      height: boundingRect.height,
     };
   } catch (e) {
     return null; // selection not available
@@ -122,11 +111,6 @@ function createDiv(info) {
     border-radius:2px;
     color: ${isDarkMode ? "#fff" : "#222"};
 }
-/*
-.mwe-popups.mwe-popups-is-not-tall {
-    width:320px
-}
-*/
 .mwe-popups .mwe-popups-container{
     margin-top:-9px;
     padding-top:9px;
@@ -145,44 +129,6 @@ function createDiv(info) {
     text-decoration:none;
     position:relative
 }
-/*
-.mwe-popups.flipped_y:before {
-    content:'';
-    position:absolute;
-    border:8px solid transparent;
-    border-bottom:0;
-    border-top: 8px solid #a2a9b1;
-    bottom:-8px;
-    left:10px
-}
-.mwe-popups.flipped_y:after {
-    content:'';
-    position:absolute;
-    border:11px solid transparent;
-    border-bottom:0;
-    border-top:11px solid #fff;
-    bottom:-7px;
-    left:7px
-}
- .mwe-popups.mwe-popups-no-image-tri:before {
-    content:'';
-    position:absolute;
-    border:8px solid transparent;
-    border-top:0;
-    border-bottom: 8px solid #a2a9b1;
-    top:-8px;
-    left:10px;
-}
-.mwe-popups.mwe-popups-no-image-tri:after {
-    content:'';
-    position:absolute;
-    border:11px solid transparent;
-    border-top:0;
-    border-bottom:11px solid #fff;
-    top:-7px;
-    left:7px;
-}
-*/
 .audio {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcUlEQVQ4y2P4//8/AyUYQhAH3gNxA7IAIQPmo/H3g/QA8XkgFiBkwHyoYnRQABVfj88AmGZcTuuHyjlgMwBZM7IE3NlQGhQe65EN+I8Dw8MLGgYoFpFqADK/YUAMwOsFigORatFIlYRElaRMWmaiBAMAp0n+3U0kqkAAAAAASUVORK5CYII=);
     background-position: center;
@@ -253,12 +199,6 @@ function createDiv(info) {
   };
 }
 
-function getSelectionCoords(selection) {
-  let oRange = selection.getRangeAt(0); //get the text range
-  let oRect = oRange.getBoundingClientRect();
-  return oRect;
-}
-
 function appendToDiv(createdDiv, content) {
   let hostDiv = createdDiv.heading.getRootNode().host;
   let popupDiv = createdDiv.heading.getRootNode().querySelectorAll("div")[1];
@@ -299,46 +239,6 @@ function removeMeaning(event) {
   }
 }
 
-function delayed_showMeaning(e) {
-  clearTimeout(showMeaningTID);
-
-  showMeaningTID = setTimeout(() => {
-    showMeaning(e);
-  }, 700);
-}
-
-/*
-document.addEventListener("mouseup", (e) => {
-  if (TRIGGER_KEY === "none") {
-    delayed_showMeaning(e);
-    return;
-  }
-
-  //e has property altKey, shiftKey, cmdKey representing they key being pressed while double clicking.
-  if (e[`${TRIGGER_KEY}Key`]) {
-    delayed_showMeaning(e);
-    return;
-  }
-});
-*/
-
-/*
-document.addEventListener("dblclick", (e) => {
-  if (TRIGGER_KEY === "none") {
-    delayed_showMeaning(e);
-    return;
-  }
-
-  //e has property altKey, shiftKey, cmdKey representing they key being pressed while double clicking.
-  if (e[`${TRIGGER_KEY}Key`]) {
-    delayed_showMeaning(e);
-    return;
-  }
-});
-
-document.addEventListener("click", removeMeaning);
-*/
-
 (async function () {
   let results = await browser.storage.local.get();
 
@@ -364,7 +264,7 @@ document.addEventListener("click", removeMeaning);
   mc.get("singletap").requireFailure("doubletap");
 
   mc.on("doubletap", function (ev) {
-    delayed_showMeaning(ev);
+    showMeaning(ev);
   });
 
   mc.on("singletap", function (ev) {

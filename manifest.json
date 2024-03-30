@@ -23,5 +23,5 @@
     "scripts": ["background.js"]
   },
   "permissions": ["menus", "storage", "https://www.google.com/"],
-  "version": "2.2.14"
+  "version": "2.2.15"
 }
