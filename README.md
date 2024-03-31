@@ -3,16 +3,8 @@ Double click any word to view its definition in a popup bubble Fork of the
 adds a couple of more features/improvements
 
 <b>Short Demo Video:</b>
-<ul>
-  <li>
-    Android:
-    https://github.com/igorlogius/dbl-click-dict/assets/67047467/ad61d99a-22e4-43c1-8694-4ae14a2b3813
-  </li>
-  <li>
-    Desktop:
-    https://github.com/igorlogius/dbl-click-dict/assets/67047467/00989e84-f744-4803-ae91-9216081717d8
-  </li>
-</ul>
+
+https://github.com/igorlogius/dbl-click-dict/assets/67047467/ad61d99a-22e4-43c1-8694-4ae14a2b3813
 
 <b>Features/Usage</b>
 <ul>
