@@ -1,6 +1,8 @@
 Double click any word to view its definition in a popup bubble. 
 Fork of "Dictionary Anywhere" made to be usable on android
 
+### [Click here to report a bug, make a suggestion or ask a question](https://github.com/igorlogius/igorlogius/issues/new/choose)
+
 <b>Short Demo Video:</b>
 
 https://github.com/igorlogius/dbl-click-dict/assets/67047467/ad61d99a-22e4-43c1-8694-4ae14a2b3813
