@@ -1,6 +1,8 @@
 Double click any word to view its definition in a popup bubble. 
 Fork of "Dictionary Anywhere" made to be usable on android
 
+[![](https://raw.githubusercontent.com/igorlogius/igorlogius/main/geFxAddon.png)](https://addons.mozilla.org/firefox/addon/dbl-click-dict/)
+
 ### [Click here to report a bug, make a suggestion or ask a question](https://github.com/igorlogius/igorlogius/issues/new/choose)
 
 <b>Short Demo Video:</b>
