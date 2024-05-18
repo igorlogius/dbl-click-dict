@@ -116,7 +116,7 @@ async function downloadHistory(e) {
   anchorTag.href = window.URL.createObjectURL(
     new Blob([fileContent], {
       type: "text/plain",
-    })
+    }),
   );
 
   anchorTag.dispatchEvent(new MouseEvent("click"));
@@ -156,7 +156,7 @@ function showSaveStatusAnimation() {
   window.setTimeout(function () {
     SAVE_STATUS.style.setProperty(
       "-webkit-transition",
-      "opacity 0.4s ease-out"
+      "opacity 0.4s ease-out",
     );
     SAVE_STATUS.style.opacity = 0;
   }, 1500);

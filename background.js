@@ -38,7 +38,6 @@ browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
 
   let response = await fetch(url, {
     method: "GET",
-    credentials: "omit",
     headers,
   });
   let text = await response.text();
