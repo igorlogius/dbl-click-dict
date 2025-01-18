@@ -1,5 +1,7 @@
 /* global browser */
 
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
 const FXVER = /rv:([0-9.]+)/.exec(navigator.userAgent)[1];
 const USRAG = `Mozilla/5.0 (X11; Linux x86_64; rv:${FXVER}) Gecko/20100101 Firefox/${FXVER}`;
 
@@ -32,17 +34,39 @@ browser.runtime.onMessage.addListener(async (request /*, sender*/) => {
 
   let url = `https://www.google.com/search?hl=${lang}&q=define+${word}&gl=US`;
 
+  console.debug(url);
+
   const headers = new Headers({
     "User-Agent": USRAG,
   });
 
   let response = await fetch(url, {
     method: "GET",
+    credentials: "include",
     headers,
   });
   let text = await response.text();
-  const document = new DOMParser().parseFromString(text, "text/html"),
+  let document = new DOMParser().parseFromString(text, "text/html");
+  let content = extractMeaning(document, { word, lang });
+
+  // TODO: workaround to google requireing cookies  now
+  if (content === null) {
+    const cookie_tab = await browser.tabs.create({
+      url,
+      active: false,
+    });
+
+    await sleep(2500);
+    browser.tabs.remove(cookie_tab.id);
+    response = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+      headers,
+    });
+    text = await response.text();
+    document = new DOMParser().parseFromString(text, "text/html");
     content = extractMeaning(document, { word, lang });
+  }
 
   results = await browser.storage.local.get();
   if (content && results) {
